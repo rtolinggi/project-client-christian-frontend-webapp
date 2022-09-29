@@ -13,3 +13,11 @@ export type InputSignIn = {
   nama_pengguna: string;
   kata_sandi: string;
 }
+
+export type ErrorResponse = {
+    status: number,
+    data: {
+    success:boolean;
+    message: string;
+  }
+}

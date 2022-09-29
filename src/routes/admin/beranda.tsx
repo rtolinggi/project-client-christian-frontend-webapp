@@ -1,7 +1,5 @@
+import { Title } from "@mantine/core";
+
 export default function Beranda() {
-  return (
-    <div>
-      <h1>HALAMAN BERANDA</h1>
-    </div>
-  );
+  return <Title>HALAMAN BERANDA</Title>;
 }

@@ -1,14 +1,22 @@
-import { RouterProvider, createBrowserRouter, Outlet } from "react-router-dom";
-import AdminLayout from "./components/adminLayout";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Link,
+  useMatches,
+} from "react-router-dom";
 import AuthLayout from "./components/authLayout";
 import ProtectedRoute from "./components/protectedRoute";
+import { AuthContextProvider } from "./context/authContext";
 import IndexPage, { loader as indexLoader } from "./routes";
+import AdminLayout from "./routes/admin";
 import Beranda from "./routes/admin/beranda";
-import Profile from "./routes/admin/profile";
+import Karyawan from "./routes/admin/karyawan";
+import KaryawanTable from "./routes/admin/karyawan/index";
 import Login, {
-  action as loginAction,
   loader as loginLoader,
+  action as loginAction,
 } from "./routes/public/login";
+import ErrorLogin from "./routes/public/login/notification";
 
 const router = createBrowserRouter([
   {
@@ -24,8 +32,12 @@ const router = createBrowserRouter([
       {
         index: true,
         element: <Login />,
-        action: loginAction,
         loader: loginLoader,
+        action: loginAction,
+      },
+      {
+        path: "anautorized",
+        element: <ErrorLogin message="" />,
       },
     ],
   },
@@ -36,21 +48,34 @@ const router = createBrowserRouter([
         <AdminLayout />
       </ProtectedRoute>
     ),
+    handle: { crumb: () => <Link to="/admin/beranda">Admin</Link> },
     children: [
       {
-        index: true,
+        path: "beranda",
         element: <Beranda />,
+        handle: { crumb: () => <Link to="/admin/beranda">Beranda</Link> },
       },
       {
-        path: "profile",
-        element: <Profile />,
+        path: "karyawan",
+        element: <Karyawan />,
+        handle: { crumb: () => <Link to="/admin/karyawan">Karyawan</Link> },
+        children: [
+          {
+            index: true,
+            element: <KaryawanTable />,
+          },
+        ],
       },
     ],
   },
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthContextProvider>
+      <RouterProvider router={router} />
+    </AuthContextProvider>
+  );
 }
 
 export default App;

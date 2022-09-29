@@ -1,30 +1,31 @@
-import { Container, Title } from "@mantine/core";
-import { axios } from "../utils/axios";
-import { type LoaderFunction, redirect } from "react-router-dom";
-import { User } from "../utils/types";
-
-interface Response {
-  success: boolean;
-  data: Array<User>;
-}
+import { Container, LoadingOverlay } from "@mantine/core";
+import { Suspense } from "react";
+import {
+  type LoaderFunction,
+  defer,
+  useLoaderData,
+  Await,
+  Navigate,
+} from "react-router-dom";
+import { GetSession } from "../utils/api";
 
 export default function IndexPage(): JSX.Element {
+  const loaderData: any = useLoaderData();
   return (
     <Container>
-      <h1>TESTING</h1>
+      <Suspense fallback={<LoadingOverlay visible={loaderData} />}>
+        <Await
+          resolve={loaderData.session}
+          errorElement={<p>Terjadi Ganguan di Server...</p>}>
+          {(data) =>
+            data ? <Navigate to={"/admin"} /> : <Navigate to={"/login"} />
+          }
+        </Await>
+      </Suspense>
     </Container>
   );
 }
 
-export const loader: LoaderFunction = async () => {
-  try {
-    const response = await axios.get("/user");
-    if (response.status === 401) {
-      return redirect("/login");
-    }
-    return redirect("/admin");
-  } catch (error) {
-    console.log(error);
-    return redirect("/login");
-  }
+export const loader: LoaderFunction = () => {
+  return defer({ session: GetSession() });
 };
