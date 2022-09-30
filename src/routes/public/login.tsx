@@ -12,30 +12,9 @@ import {
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconLock, IconUser } from "@tabler/icons";
-import {
-  Form,
-  type LoaderFunction,
-  useSubmit,
-  ActionFunction,
-  useActionData,
-  useNavigation,
-  useNavigate,
-} from "react-router-dom";
+import { Form } from "react-router-dom";
 import Logo from "../../assets/logo.svg";
 import z from "zod";
-import { GetSession, SignIn } from "../../utils/api";
-import ErrorLogin from "./login/notification";
-import { useContext, useEffect } from "react";
-import AuthContext from "../../context/authContext";
-
-export const loader: LoaderFunction = () => {
-  return GetSession();
-};
-
-export const action: ActionFunction = async ({ request }) => {
-  const data = JSON.stringify(Object.fromEntries(await request.formData()));
-  return SignIn(JSON.parse(data));
-};
 
 const schema = z.object({
   nama_pengguna: z
@@ -45,26 +24,6 @@ const schema = z.object({
 });
 
 export default function Login() {
-  const submit = useSubmit();
-  const navigation = useNavigation();
-  const navigate = useNavigate();
-  const actionData: any = useActionData();
-  const { signIn, isAuth } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (actionData?.success) {
-      signIn(actionData?.access_token);
-    }
-  }, [actionData]);
-
-  useEffect(() => {
-    if (isAuth) {
-      return navigate("/admin");
-    }
-  }, [isAuth]);
-
-  const isLoading = navigation.state === "submitting";
-
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
@@ -75,7 +34,6 @@ export default function Login() {
 
   return (
     <>
-      {actionData?.status && <ErrorLogin message={actionData?.data?.message} />}
       <Paper
         withBorder
         shadow="md"
@@ -90,7 +48,7 @@ export default function Login() {
           minWidth: "320px",
           margin: "auto",
         })}>
-        <LoadingOverlay visible={isLoading} />
+        <LoadingOverlay visible={false} />
         <Center>
           <Image src={Logo} alt="logo" width={80} />
         </Center>
@@ -101,13 +59,7 @@ export default function Login() {
         </Center>
         <Space h="md" />
         <Divider my="xs" label={"Selamat Datang"} labelPosition="center" />
-        <Form
-          onSubmit={form.onSubmit((val) =>
-            submit(val, {
-              action: "/login?index",
-              method: "post",
-            })
-          )}>
+        <Form onSubmit={form.onSubmit((val) => console.log(val))}>
           <TextInput
             withAsterisk
             label="Nama Pengguna"

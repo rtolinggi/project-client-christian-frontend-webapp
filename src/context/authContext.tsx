@@ -19,18 +19,15 @@ const AuthContext = React.createContext<IAuthContext>(initContext);
 export const AuthContextProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const initialToken = localStorage.getItem("token");
-  const [token, setToken] = useState<string | null>(initialToken);
+  const [token, setToken] = useState<string | null>(null);
   const userIsLogin = !!token;
 
   const loginHandler = async (token: string) => {
     setToken(token);
-    localStorage.setItem("token", token);
   };
 
   const logoutHandler = async () => {
     setToken(null);
-    localStorage.removeItem("item");
   };
 
   const contextValue: IAuthContext = {

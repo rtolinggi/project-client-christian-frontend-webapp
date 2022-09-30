@@ -4,6 +4,8 @@ import DarkMode from "../darkMode";
 import UserButton from "../userButton";
 import avatar from "../../assets/avatar.jpg";
 import { IconLogout, IconMessageCircle, IconSettings } from "@tabler/icons";
+import { axios } from "../../utils/axios";
+import { Navigate, redirect, useNavigate } from "react-router-dom";
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -41,6 +43,7 @@ type Props = {
 export const Header: React.FC<Props> = ({ setShowNavbar }) => {
   const { classes, cx } = useStyles();
   const [opened, setOpened] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   return (
     <Paper
@@ -56,10 +59,6 @@ export const Header: React.FC<Props> = ({ setShowNavbar }) => {
             return !a;
           })
         }
-        // sx={(theme) => ({
-        //   color: theme.primaryColor,
-        //   backgroundColor: theme.primaryColor,
-        // })}
         size="sm"
       />
       <Box className={classes.wrapper}>
@@ -75,7 +74,13 @@ export const Header: React.FC<Props> = ({ setShowNavbar }) => {
                 Messages
               </Menu.Item>
               <Menu.Divider />
-              <Menu.Item color="grape" icon={<IconLogout size={14} />}>
+              <Menu.Item
+                onClick={async () => {
+                  await axios.get("/auth/signout");
+                  navigate("/login");
+                }}
+                color="grape"
+                icon={<IconLogout size={14} />}>
                 Logout
               </Menu.Item>
             </Menu.Dropdown>

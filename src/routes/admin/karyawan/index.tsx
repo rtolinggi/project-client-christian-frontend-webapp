@@ -19,10 +19,6 @@ type Karyawan = {
   alamat: string;
 };
 
-type KaryawanProps = {
-  data: Array<Karyawan>;
-};
-
 const data: Array<Karyawan> = [
   {
     no: 1,

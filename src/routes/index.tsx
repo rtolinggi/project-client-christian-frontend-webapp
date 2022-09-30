@@ -9,17 +9,15 @@ import {
 } from "react-router-dom";
 import { GetSession } from "../utils/api";
 
-export default function IndexPage(): JSX.Element {
+export default function Root(): JSX.Element {
   const loaderData: any = useLoaderData();
   return (
     <Container>
       <Suspense fallback={<LoadingOverlay visible={loaderData} />}>
         <Await
           resolve={loaderData.session}
-          errorElement={<p>Terjadi Ganguan di Server...</p>}>
-          {(data) =>
-            data ? <Navigate to={"/admin"} /> : <Navigate to={"/login"} />
-          }
+          errorElement={<Navigate to="/login" />}>
+          {(data) => data && <Navigate to={"/admin"} />}
         </Await>
       </Suspense>
     </Container>

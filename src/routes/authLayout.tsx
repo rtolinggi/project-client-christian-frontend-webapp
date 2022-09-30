@@ -39,6 +39,7 @@ const useStyles = createStyles((theme) => ({
 
 const AuthLayout: React.FC = () => {
   const { classes, cx } = useStyles();
+
   return (
     <Box className={classes.root}>
       <Box

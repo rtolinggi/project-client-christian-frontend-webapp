@@ -1,4 +1,4 @@
-import { createStyles, Box, Breadcrumbs, Transition } from "@mantine/core";
+import { createStyles, Box, Breadcrumbs } from "@mantine/core";
 import { Outlet, useMatches } from "react-router-dom";
 import { useState } from "react";
 import { Header } from "../components/header";
