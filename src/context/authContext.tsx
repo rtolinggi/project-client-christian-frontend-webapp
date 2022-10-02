@@ -1,4 +1,9 @@
-import React, { type PropsWithChildren, useState } from "react";
+import React, {
+  type PropsWithChildren,
+  useState,
+  useMemo,
+  useContext,
+} from "react";
 
 interface IAuthContext {
   token: string;
@@ -23,6 +28,7 @@ export const AuthContextProvider: React.FC<PropsWithChildren> = ({
   const userIsLogin = !!token;
 
   const loginHandler = async (token: string) => {
+    console.log("IS CONTEXT : ", token);
     setToken(token);
   };
 
@@ -30,16 +36,21 @@ export const AuthContextProvider: React.FC<PropsWithChildren> = ({
     setToken(null);
   };
 
-  const contextValue: IAuthContext = {
-    token: String(token),
-    isAuth: userIsLogin,
-    signIn: loginHandler,
-    signOut: logoutHandler,
-  };
+  const contextValue: IAuthContext = useMemo(
+    () => ({
+      token: String(token),
+      isAuth: userIsLogin,
+      signIn: loginHandler,
+      signOut: logoutHandler,
+    }),
+    [token]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
   );
 };
 
-export default AuthContext;
+export const useAuth = () => {
+  return useContext(AuthContext);
+};

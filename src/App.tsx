@@ -1,16 +1,17 @@
 import { RouterProvider, createBrowserRouter, Link } from "react-router-dom";
 import AuthLayout from "./routes/authLayout";
 import ProtectedRoute from "./components/protectedRoute";
-import { AuthContextProvider } from "./context/authContext";
 import Route, { loader as RouteLoader } from "./routes";
-import AdminLayout, { loader as loaderAdmin } from "./routes/adminLayout";
-import Beranda, { loader as loaderBeranda } from "./routes/admin/beranda";
+import AdminLayout from "./routes/adminLayout";
+import Beranda from "./routes/admin/beranda";
 import Karyawan from "./routes/admin/karyawan";
-import KaryawanTable, {
-  loader as loaderKaryawan,
-} from "./routes/admin/karyawan/index";
-import Login, { action as loginAction } from "./routes/public/login";
+import KaryawanTable from "./routes/admin/karyawan/index";
+import Login from "./routes/public/login";
 import ErrorLogin from "./routes/public/login/notification";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AuthContextProvider } from "./context/authContext";
+
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -21,12 +22,10 @@ const router = createBrowserRouter([
   {
     path: "/login",
     element: <AuthLayout />,
-    action: loginAction,
     children: [
       {
         index: true,
         element: <Login />,
-        action: loginAction,
       },
       {
         path: "anautorized",
@@ -48,12 +47,10 @@ const router = createBrowserRouter([
         </Link>
       ),
     },
-    loader: loaderAdmin,
     children: [
       {
         path: "beranda",
         element: <Beranda />,
-        loader: loaderBeranda,
         handle: {
           crumb: () => (
             <Link key={Math.random()} to="/admin/beranda">
@@ -75,7 +72,6 @@ const router = createBrowserRouter([
         children: [
           {
             index: true,
-            loader: loaderKaryawan,
             element: <KaryawanTable />,
           },
         ],
@@ -86,9 +82,11 @@ const router = createBrowserRouter([
 
 function App() {
   return (
-    <AuthContextProvider>
-      <RouterProvider router={router} />
-    </AuthContextProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthContextProvider>
+        <RouterProvider router={router} />
+      </AuthContextProvider>
+    </QueryClientProvider>
   );
 }
 

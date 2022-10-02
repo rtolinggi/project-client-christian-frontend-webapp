@@ -5,7 +5,8 @@ import UserButton from "../userButton";
 import avatar from "../../assets/avatar.jpg";
 import { IconLogout, IconMessageCircle, IconSettings } from "@tabler/icons";
 import { axios } from "../../utils/axios";
-import { Navigate, redirect, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/authContext";
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -42,6 +43,7 @@ type Props = {
 
 export const Header: React.FC<Props> = ({ setShowNavbar }) => {
   const { classes, cx } = useStyles();
+  const { signOut } = useAuth();
   const [opened, setOpened] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -77,7 +79,7 @@ export const Header: React.FC<Props> = ({ setShowNavbar }) => {
               <Menu.Item
                 onClick={async () => {
                   await axios.get("/auth/signout");
-                  navigate("/login");
+                  signOut();
                 }}
                 color="grape"
                 icon={<IconLogout size={14} />}>

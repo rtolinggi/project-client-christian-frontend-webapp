@@ -12,9 +12,14 @@ import {
 } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { IconLock, IconUser } from "@tabler/icons";
-import { Form } from "react-router-dom";
+import { Form, useNavigate } from "react-router-dom";
 import Logo from "../../assets/logo.svg";
 import z from "zod";
+import { useMutation } from "@tanstack/react-query";
+import { SignIn } from "../../utils/api";
+import { showNotification } from "@mantine/notifications";
+import { useAuth } from "../../context/authContext";
+import { useEffect } from "react";
 
 const schema = z.object({
   nama_pengguna: z
@@ -23,7 +28,11 @@ const schema = z.object({
   kata_sandi: z.string().min(1, { message: "Kata Sandi Tidak Boleh Kosong" }),
 });
 
+type InputForm = z.infer<typeof schema>;
+
 export default function Login() {
+  const navigate = useNavigate();
+  const { signIn, isAuth, signOut } = useAuth();
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
@@ -31,6 +40,34 @@ export default function Login() {
       kata_sandi: "",
     },
   });
+
+  const handleSubmit = (val: InputForm) => {
+    mutation.mutate(val);
+  };
+
+  const mutation = useMutation(SignIn, {
+    onError: (error: any) => {
+      signOut();
+      showNotification({
+        title: "Otentikasi Gagal",
+        message: "Nama Pengguna atau Kata Sandi Tidak Cocok",
+        color: "red",
+      });
+    },
+    onSuccess: async (data) => {
+      signIn(data?.data.access_token);
+      showNotification({
+        title: "Otentikasi Berhasil",
+        message: `Selamat datang`,
+      });
+    },
+  });
+
+  useEffect(() => {
+    if (isAuth) {
+      navigate("/admin/beranda");
+    }
+  }, [isAuth]);
 
   return (
     <>
@@ -48,7 +85,7 @@ export default function Login() {
           minWidth: "320px",
           margin: "auto",
         })}>
-        <LoadingOverlay visible={false} />
+        <LoadingOverlay visible={mutation.isLoading} />
         <Center>
           <Image src={Logo} alt="logo" width={80} />
         </Center>
@@ -59,7 +96,7 @@ export default function Login() {
         </Center>
         <Space h="md" />
         <Divider my="xs" label={"Selamat Datang"} labelPosition="center" />
-        <Form onSubmit={form.onSubmit((val) => console.log(val))}>
+        <Form onSubmit={form.onSubmit((val) => handleSubmit(val))}>
           <TextInput
             withAsterisk
             label="Nama Pengguna"

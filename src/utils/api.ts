@@ -13,7 +13,7 @@ export const SignIn = async (input: InputSignIn) => {
       status: error.response?.status,
       data: error.response?.data,
     };
-    return errorResult;
+    throw errorResult;
   }
 };
 
