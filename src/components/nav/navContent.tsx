@@ -7,6 +7,7 @@ import {
   IconLayoutDashboard,
   IconListDetails,
   IconReceipt,
+  IconUserPlus,
 } from "@tabler/icons";
 import { Link, useLocation } from "react-router-dom";
 import { Box, NavLink, ThemeIcon, useMantineTheme } from "@mantine/core";
@@ -65,6 +66,12 @@ const data = [
     label: "Karyawan",
     to: "karyawan",
     pathName: "/karyawan",
+  },
+  {
+    icon: IconUserPlus,
+    label: "user",
+    to: "user",
+    pathName: "/user",
   },
 ];
 

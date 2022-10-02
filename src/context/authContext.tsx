@@ -6,7 +6,7 @@ import React, {
 } from "react";
 
 interface IAuthContext {
-  token: string;
+  token: string | null;
   isAuth: boolean;
   signIn: (props: string) => void;
   signOut: () => void;
@@ -24,16 +24,18 @@ const AuthContext = React.createContext<IAuthContext>(initContext);
 export const AuthContextProvider: React.FC<PropsWithChildren> = ({
   children,
 }) => {
-  const [token, setToken] = useState<string | null>(null);
+  const initialToken = window.localStorage.getItem("refresh_token");
+  const [token, setToken] = useState<string | null>(initialToken);
   const userIsLogin = !!token;
 
   const loginHandler = async (token: string) => {
-    console.log("IS CONTEXT : ", token);
     setToken(token);
+    window.localStorage.setItem("refresh_token", token);
   };
 
   const logoutHandler = async () => {
     setToken(null);
+    window.localStorage.removeItem("refresh_token");
   };
 
   const contextValue: IAuthContext = useMemo(

@@ -1,4 +1,5 @@
 import {
+  LoadingOverlay,
   Group,
   Paper,
   Text,
@@ -11,72 +12,59 @@ import DataTable from "../../../components/dataTable";
 import { openConfirmModal } from "@mantine/modals";
 import React from "react";
 import { IconEdit, IconTrash } from "@tabler/icons";
+import { useQuery } from "@tanstack/react-query";
+import { GetUsers } from "../../../utils/api";
 
 type Karyawan = {
-  no: number;
-  userId: string;
-  namaLengkap: string;
-  alamat: string;
+  no: string;
+  nama_pengguna: string;
+  role: string;
 };
 
-const data: Array<Karyawan> = [
+const dataTable: Array<Karyawan> = [
   {
-    no: 1,
-    userId: "SEMDO001",
-    namaLengkap: "Rio Tolinggi",
-    alamat: "Manado",
+    no: "1",
+    nama_pengguna: "SEMDO001",
+    role: "Admin",
   },
   {
-    no: 2,
-    userId: "SEMDO002",
-    namaLengkap: "Regina Rumengan",
-    alamat: "Manado",
+    no: "2",
+    nama_pengguna: "SEMDO002",
+    role: "SE",
   },
   {
-    no: 3,
-    userId: "SEMDO003",
-    namaLengkap: "lovely Tolinggi",
-    alamat: "Manado",
+    no: "3",
+    nama_pengguna: "SEMDO003",
+    role: "SPG",
   },
   {
-    no: 4,
-    userId: "SEMDO004",
-    namaLengkap: "Rama Tolinggi",
-    alamat: "Manado",
+    no: "4",
+    nama_pengguna: "SEMDO004",
+    role: "Rama Tolinggi",
   },
   {
-    no: 5,
-    userId: "SEMDO005",
-    namaLengkap: "Kanzia Tolinggi",
-    alamat: "Manado",
+    no: "5",
+    nama_pengguna: "SEMDO005",
+    role: "Kanzia Tolinggi",
   },
 ];
 
-export default function TableKaryawan() {
+export function TableUser() {
   const { classes } = useStyles();
-  console.log("Index Karywawan");
+  const { isLoading } = useQuery(["GetUsers"], GetUsers);
   const columns = React.useMemo<ColumnDef<Karyawan, any>[]>(
     () => [
       {
-        id: "no",
         header: "No.",
+        accessorKey: "no",
       },
       {
-        id: "userId",
-        header: "User ID",
-        accessorKey: "userId",
+        header: "Nama Pengguna",
+        accessorKey: "nama_pengguna",
       },
       {
-        id: "namaLengkap",
-        header: "Nama Lengkap",
-        accessorKey: "namaLengkap",
-        enableGlobalFilter: true,
-        filterFn: "arrIncludesAll",
-      },
-      {
-        id: "alamat",
-        header: "Alamat",
-        accessorKey: "alamat",
+        header: "Role",
+        accessorKey: "role",
       },
       {
         id: "action",
@@ -132,7 +120,8 @@ export default function TableKaryawan() {
   return (
     <>
       <Paper shadow="sm" radius="md" className={classes.container}>
-        <DataTable data={data} columns={columns} visibility={{}} />
+        <LoadingOverlay visible={isLoading} />
+        <DataTable data={dataTable} columns={columns} visibility={{}} />
       </Paper>
     </>
   );
@@ -144,6 +133,7 @@ const useStyles = createStyles((theme) => ({
     padding: "20px",
     overflow: "auto",
     marginTop: "1.2rem",
+    position: "relative",
   },
   loaderHeight: {
     height: "500px",

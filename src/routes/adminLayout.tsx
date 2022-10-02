@@ -1,8 +1,15 @@
-import { createStyles, Box, Breadcrumbs } from "@mantine/core";
-import { Outlet, useMatches } from "react-router-dom";
-import { useState } from "react";
+import { Button, createStyles, Box, Breadcrumbs, Group } from "@mantine/core";
+import {
+  Outlet,
+  useLocation,
+  useMatch,
+  useMatches,
+  useNavigate,
+} from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Header } from "../components/header";
 import { CNavbar } from "../components/nav";
+import { IconPlus } from "@tabler/icons";
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -54,10 +61,22 @@ const LoaderData = {
 export default function AdminLayout() {
   const { classes } = useStyles();
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
+  const navigate = useNavigate();
+  let location = useLocation().pathname;
   let matches = useMatches();
   let crumbs = matches
     .filter((match: any) => Boolean(match.handle?.crumb))
     .map((match: any) => match.handle.crumb(match.data));
+  const [hideButton, setHideButton] = useState<boolean>(false);
+
+  useEffect(() => {
+    const path = matches.map((e) => e.pathname).pop();
+    if (path === location) {
+      setHideButton(true);
+    } else {
+      setHideButton(false);
+    }
+  }, [navigate]);
 
   return (
     <Box className={classes.container}>
@@ -70,7 +89,15 @@ export default function AdminLayout() {
         </Box>
         <Box mt="10px"></Box>
         <Box>
-          <Breadcrumbs>{crumbs.map((crumb) => crumb)}</Breadcrumbs>
+          <Group position="apart" px="md">
+            <Breadcrumbs>{crumbs.map((crumb) => crumb)}</Breadcrumbs>
+            <Button
+              hidden={hideButton}
+              onClick={() => navigate(`${location}/post`)}
+              leftIcon={<IconPlus size={16} />}>
+              Tambah
+            </Button>
+          </Group>
           <Outlet />
         </Box>
       </Box>

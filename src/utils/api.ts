@@ -1,6 +1,6 @@
 import { AxiosError } from "axios";
 import { axios } from "../utils/axios";
-import { InputSignIn } from "./types";
+import { InputSignIn, InputSignUp } from "./types";
 
 export const SignIn = async (input: InputSignIn) => {
   try {
@@ -9,11 +9,29 @@ export const SignIn = async (input: InputSignIn) => {
     return result;
   } catch (err) {
     const error = err as AxiosError;
-    const errorResult = {
-      status: error.response?.status,
-      data: error.response?.data,
-    };
-    throw errorResult;
+    throw error.response?.data;
+  }
+};
+
+export const SignUp = async (input: InputSignUp) => {
+  try {
+    const res = await axios.post("/auth/signup", input);
+    const result = await res.data;
+    return result;
+  } catch (err) {
+    const error = err as AxiosError;
+    throw error.response?.data;
+  }
+};
+
+export const GetUsers = async () => {
+  try {
+    const res = await axios.get("/user");
+    const result = await res.data;
+    return result;
+  } catch (err) {
+    const error = err as AxiosError;
+    throw error.response?.data;
   }
 };
 
