@@ -17,7 +17,7 @@ export default function Root(): JSX.Element {
         <Await
           resolve={loaderData.session}
           errorElement={<Navigate to="/login" />}>
-          {(data) => data && <Navigate to={"/admin"} />}
+          {(data) => data && <Navigate to={"/admin/beranda"} />}
         </Await>
       </Suspense>
     </Container>

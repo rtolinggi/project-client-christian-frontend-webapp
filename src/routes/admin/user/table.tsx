@@ -1,62 +1,56 @@
-import {
-  LoadingOverlay,
-  Group,
-  Paper,
-  Text,
-  ThemeIcon,
-  UnstyledButton,
-  createStyles,
-} from "@mantine/core";
+import { LoadingOverlay, Paper, createStyles } from "@mantine/core";
 import type { ColumnDef } from "@tanstack/react-table";
 import DataTable from "../../../components/dataTable";
-import { openConfirmModal } from "@mantine/modals";
 import React from "react";
-import { IconEdit, IconTrash } from "@tabler/icons";
 import { useQuery } from "@tanstack/react-query";
 import { GetUsers } from "../../../utils/api";
+import { type DataUsers } from "../../../utils/types";
+import { ActionButton } from "../../../components/actionButton";
 
-type Karyawan = {
-  no: string;
-  nama_pengguna: string;
-  role: string;
+type ResponseUsers = {
+  code: number;
+  data: Array<DataUsers>;
+  errors: {} | null;
+  status: string;
 };
 
-const dataTable: Array<Karyawan> = [
+const dummyData = [
   {
-    no: "1",
-    nama_pengguna: "SEMDO001",
-    role: "Admin",
-  },
-  {
-    no: "2",
-    nama_pengguna: "SEMDO002",
-    role: "SE",
-  },
-  {
-    no: "3",
-    nama_pengguna: "SEMDO003",
-    role: "SPG",
-  },
-  {
-    no: "4",
-    nama_pengguna: "SEMDO004",
-    role: "Rama Tolinggi",
-  },
-  {
-    no: "5",
-    nama_pengguna: "SEMDO005",
-    role: "Kanzia Tolinggi",
+    nama_pengguna: "",
+    role: "",
+    CreatedAt: null,
   },
 ];
 
 export function TableUser() {
   const { classes } = useStyles();
-  const { isLoading } = useQuery(["GetUsers"], GetUsers);
-  const columns = React.useMemo<ColumnDef<Karyawan, any>[]>(
+  const { data: users, isLoading } = useQuery<ResponseUsers>(
+    ["GetUsers"],
+    GetUsers
+  );
+
+  const dataTable = users
+    ? users.data.map((item) => {
+        let data = {
+          id: item.ID,
+          nama_pengguna: item.nama_pengguna,
+          role: item.role,
+          CreatedAt: item.CreatedAt,
+        };
+        return data;
+      })
+    : dummyData;
+
+  const columns = React.useMemo<ColumnDef<typeof dataTable, any>[]>(
     () => [
       {
+        id: "no",
         header: "No.",
-        accessorKey: "no",
+        cell: (props) => parseInt(props.row.id) + 1,
+      },
+      {
+        id: "id",
+        accessorKey: "id",
       },
       {
         header: "Nama Pengguna",
@@ -65,51 +59,14 @@ export function TableUser() {
       {
         header: "Role",
         accessorKey: "role",
+        sortDescFirst: true,
       },
       {
         id: "action",
-        header: "Actions",
+        header: "Aksi",
         cell: (props) => {
-          const idSupplier = props.row
-            .getAllCells()
-            .map((item) => item.getValue());
-          return (
-            <Group spacing="xs">
-              <ThemeIcon
-                color="red"
-                variant="light"
-                style={{ cursor: "pointer", marginRight: "10px" }}>
-                <UnstyledButton
-                  onClick={() =>
-                    openConfirmModal({
-                      title: "Delete Store",
-                      centered: true,
-                      children: (
-                        <Text size="sm">
-                          Are you sure you want to delete Store{" "}
-                          {idSupplier[2] as string}?
-                        </Text>
-                      ),
-                      labels: {
-                        confirm: "Delete Store",
-                        cancel: "No don't delete it",
-                      },
-                      onCancel: () => console.log("Cancel"),
-                    })
-                  }>
-                  <IconTrash size={20} stroke={1.5} />
-                </UnstyledButton>
-              </ThemeIcon>
-              <ThemeIcon
-                color="lime"
-                variant="light"
-                style={{ cursor: "pointer" }}>
-                <UnstyledButton type="submit" name="action" value="updateStore">
-                  <IconEdit size={20} stroke={1.5} />
-                </UnstyledButton>
-              </ThemeIcon>
-            </Group>
-          );
+          const row = props.row.getAllCells().map((item) => item.getValue());
+          return <ActionButton data={row[1] as string} />;
         },
       },
     ],
@@ -121,7 +78,11 @@ export function TableUser() {
     <>
       <Paper shadow="sm" radius="md" className={classes.container}>
         <LoadingOverlay visible={isLoading} />
-        <DataTable data={dataTable} columns={columns} visibility={{}} />
+        <DataTable
+          data={dataTable}
+          columns={columns}
+          visibility={{ id: false }}
+        />
       </Paper>
     </>
   );

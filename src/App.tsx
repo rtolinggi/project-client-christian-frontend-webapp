@@ -13,8 +13,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AuthContextProvider } from "./context/authContext";
 import PageUser from "./routes/admin/user";
 import { DetailUser, PostUser, TableUser } from "./routes/admin/user/index";
+import { UpdateUser } from "./routes/admin/user/update";
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
   {
@@ -95,12 +96,23 @@ const router = createBrowserRouter([
             element: <TableUser />,
           },
           {
-            path: "detail",
+            path: ":id/detail",
             element: <DetailUser />,
             handle: {
               crumb: () => (
-                <Link key={Math.random()} to="detail">
+                <Link key={Math.random()} to="#">
                   Detail
+                </Link>
+              ),
+            },
+          },
+          {
+            path: ":id/update",
+            element: <UpdateUser />,
+            handle: {
+              crumb: () => (
+                <Link key={Math.random()} to="#">
+                  Update
                 </Link>
               ),
             },
@@ -110,7 +122,7 @@ const router = createBrowserRouter([
             element: <PostUser />,
             handle: {
               crumb: () => (
-                <Link key={Math.random()} to="post">
+                <Link key={Math.random()} to="#">
                   Post
                 </Link>
               ),

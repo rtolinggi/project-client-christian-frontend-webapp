@@ -17,11 +17,12 @@ import {
   IconLock,
   IconUser,
 } from "@tabler/icons";
-import { useMutation } from "@tanstack/react-query";
-import { Form, useNavigate } from "react-router-dom";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Form, useNavigate, useParams } from "react-router-dom";
 import z from "zod";
-import { SignUp } from "../../../utils/api";
-import { ErrorMutation } from "../../../utils/types";
+import { queryClient } from "../../../App";
+import { GetUsersId, SignUp } from "../../../utils/api";
+import { DataUsers, ErrorMutation } from "../../../utils/types";
 
 const schema = z
   .object({
@@ -39,14 +40,28 @@ const schema = z
 
 type InputForm = z.infer<typeof schema>;
 
-export const PostUser: React.FC = () => {
+type ResponseUsers = {
+  code: number;
+  status: string;
+  data: Array<DataUsers>;
+  errors: {} | null;
+};
+
+export const UpdateUser: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const data = queryClient.getQueryState<ResponseUsers>(["GetUsers"]);
+  const userData = data?.data?.data.filter(
+    (item) => item.ID === parseInt(id as string)
+  );
+
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      nama_pengguna: "",
-      kata_sandi: "",
-      role: "",
+      nama_pengguna: userData ? userData[0].nama_pengguna : "",
+      kata_sandi: userData ? userData[0].kata_sandi : "",
+      konfirmasi_sandi: userData ? userData[0].kata_sandi : "",
+      role: userData ? userData[0].role : "",
     },
   });
 
@@ -84,15 +99,13 @@ export const PostUser: React.FC = () => {
 
   return (
     <Box style={{ position: "relative" }}>
-      <LoadingOverlay visible={mutation.isLoading} />
       <Form onSubmit={form.onSubmit((val) => handleSubmit(val))}>
         <Paper shadow="md" radius="md" px="20px" py="20px">
-          <Title order={4}>TAMBAH USER</Title>
+          <Title order={4}>EDIT USER</Title>
           <Divider my="lg" />
           <TextInput
             withAsterisk
             label="Nama Pengguna"
-            autoComplete="email"
             icon={<IconUser size={18} />}
             {...form.getInputProps("nama_pengguna")}
           />
@@ -117,7 +130,7 @@ export const PostUser: React.FC = () => {
             description="Pilih role sesuai posisi Karyawan"
             label="Role"
             placeholder="Pilih Salah Satu"
-            defaultValue={"SE"}
+            defaultValue={userData ? userData[0].role : ""}
             data={[
               { value: "SE", label: "SE" },
               { value: "SPG", label: "SPG" },

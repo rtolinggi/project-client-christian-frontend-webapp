@@ -8,7 +8,7 @@ import {
   TextInput,
 } from "@mantine/core";
 
-import type { SortingState } from "@tanstack/react-table";
+import type { SortingState, PaginationState } from "@tanstack/react-table";
 import {
   flexRender,
   getCoreRowModel,
@@ -29,6 +29,10 @@ const DataTable: React.FC<Props> = ({ columns, data, visibility }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const [columnVisibility, setColumnVisibility] = useState(visibility);
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageSize: 5,
+    pageIndex: 0,
+  });
 
   const table = useReactTable({
     data,
@@ -38,7 +42,9 @@ const DataTable: React.FC<Props> = ({ columns, data, visibility }) => {
       globalFilter,
       sorting,
       columnVisibility,
+      pagination,
     },
+    onPaginationChange: setPagination,
     onGlobalFilterChange: setGlobalFilter,
     onColumnVisibilityChange: setColumnVisibility,
     onSortingChange: setSorting,
@@ -46,7 +52,7 @@ const DataTable: React.FC<Props> = ({ columns, data, visibility }) => {
     getSortedRowModel: getSortedRowModel(),
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    debugTable: true,
+    debugTable: false, // set to true for debugging table
   });
 
   return (
@@ -59,21 +65,21 @@ const DataTable: React.FC<Props> = ({ columns, data, visibility }) => {
         }}>
         <Group position="left">
           <TextInput
-            placeholder="Search Data...."
+            placeholder="Cari Data...."
             icon={<IconSearch size={20} />}
             value={globalFilter || ""}
             onChange={(e) => setGlobalFilter(e.target.value)}
           />
         </Group>
         <Group spacing="xs" position="right">
-          <Text size="sm">Showing</Text>
+          <Text size="sm">Tampilkan</Text>
           <Select
-            defaultValue={String(10)}
+            value={String(table.getState().pagination.pageSize)}
             data={[String(5), String(10), String(15), String(20)]}
             style={{ width: "4rem" }}
             onChange={(e) => table.setPageSize(Number(e))}
           />
-          <Text size="sm">Entries</Text>
+          <Text size="sm">Data</Text>
         </Group>
       </Group>
       <CTable verticalSpacing="sm" striped highlightOnHover>
@@ -136,11 +142,11 @@ const DataTable: React.FC<Props> = ({ columns, data, visibility }) => {
           justifyContent: "space-between",
         }}>
         <Group>
-          <Text size="sm">{`Page ${
+          <Text size="sm">{`Halaman ${
             table.getState().pagination.pageIndex + 1
-          } of  ${table.getPageCount()}`}</Text>
+          } dari  ${table.getPageCount()}`}</Text>
           <Text size="sm">
-            {table.getPrePaginationRowModel().rows.length} Record
+            {table.getPrePaginationRowModel().rows.length} Baris
           </Text>
         </Group>
         <Pagination

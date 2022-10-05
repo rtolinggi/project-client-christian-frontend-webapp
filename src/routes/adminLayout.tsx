@@ -9,7 +9,7 @@ import {
 import { useEffect, useState } from "react";
 import { Header } from "../components/header";
 import { CNavbar } from "../components/nav";
-import { IconPlus } from "@tabler/icons";
+import { IconEdit, IconPlus } from "@tabler/icons";
 
 const useStyles = createStyles((theme) => ({
   container: {
@@ -64,17 +64,20 @@ export default function AdminLayout() {
   const navigate = useNavigate();
   let location = useLocation().pathname;
   let matches = useMatches();
+  const { id } = matches.map((item) => item.params)[0];
+  const routeUrl = matches.map((item) => item.pathname.toString());
+  const updateSomeUrl = `${routeUrl[1]}/${id}/update` === location;
   let crumbs = matches
     .filter((match: any) => Boolean(match.handle?.crumb))
     .map((match: any) => match.handle.crumb(match.data));
-  const [hideButton, setHideButton] = useState<boolean>(false);
+  const [hideButtonPost, setHideButtonPost] = useState<boolean>(false);
 
   useEffect(() => {
     const path = matches.map((e) => e.pathname).pop();
     if (path === location) {
-      setHideButton(true);
+      setHideButtonPost(true);
     } else {
-      setHideButton(false);
+      setHideButtonPost(false);
     }
   }, [navigate]);
 
@@ -91,12 +94,21 @@ export default function AdminLayout() {
         <Box>
           <Group position="apart" px="md">
             <Breadcrumbs>{crumbs.map((crumb) => crumb)}</Breadcrumbs>
-            <Button
-              hidden={hideButton}
-              onClick={() => navigate(`${location}/post`)}
-              leftIcon={<IconPlus size={16} />}>
-              Tambah
-            </Button>
+            {id ? (
+              <Button
+                hidden={updateSomeUrl}
+                onClick={() => navigate(`${routeUrl[1]}/${id}/update`)}
+                leftIcon={<IconEdit size={16} />}>
+                Edit
+              </Button>
+            ) : (
+              <Button
+                hidden={hideButtonPost}
+                onClick={() => navigate(`${location}/post`)}
+                leftIcon={<IconPlus size={16} />}>
+                Tambah
+              </Button>
+            )}
           </Group>
           <Outlet />
         </Box>

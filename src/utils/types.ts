@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 export type User = {
   CreatedAt: string;
   DeletedAt: string;
@@ -33,4 +35,15 @@ export type ErrorResponse = {
     success: boolean;
     message: string;
   };
+};
+
+export type DataUsers = {
+  ID: number;
+  CreatedAt: Date;
+  UpdatedAt: Date;
+  DeletedAt: Date;
+  nama_pengguna: string;
+  kata_sandi: string;
+  refresh_token: string;
+  role: string;
 };

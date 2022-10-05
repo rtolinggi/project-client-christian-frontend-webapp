@@ -11,6 +11,7 @@ import DataTable from "../../../components/dataTable";
 import { openConfirmModal } from "@mantine/modals";
 import React from "react";
 import { IconEdit, IconTrash } from "@tabler/icons";
+import { ActionButton } from "../../../components/actionButton";
 
 type Karyawan = {
   no: number;
@@ -54,7 +55,6 @@ const data: Array<Karyawan> = [
 
 export default function TableKaryawan() {
   const { classes } = useStyles();
-  console.log("Index Karywawan");
   const columns = React.useMemo<ColumnDef<Karyawan, any>[]>(
     () => [
       {
@@ -85,43 +85,7 @@ export default function TableKaryawan() {
           const idSupplier = props.row
             .getAllCells()
             .map((item) => item.getValue());
-          return (
-            <Group spacing="xs">
-              <ThemeIcon
-                color="red"
-                variant="light"
-                style={{ cursor: "pointer", marginRight: "10px" }}>
-                <UnstyledButton
-                  onClick={() =>
-                    openConfirmModal({
-                      title: "Delete Store",
-                      centered: true,
-                      children: (
-                        <Text size="sm">
-                          Are you sure you want to delete Store{" "}
-                          {idSupplier[2] as string}?
-                        </Text>
-                      ),
-                      labels: {
-                        confirm: "Delete Store",
-                        cancel: "No don't delete it",
-                      },
-                      onCancel: () => console.log("Cancel"),
-                    })
-                  }>
-                  <IconTrash size={20} stroke={1.5} />
-                </UnstyledButton>
-              </ThemeIcon>
-              <ThemeIcon
-                color="lime"
-                variant="light"
-                style={{ cursor: "pointer" }}>
-                <UnstyledButton type="submit" name="action" value="updateStore">
-                  <IconEdit size={20} stroke={1.5} />
-                </UnstyledButton>
-              </ThemeIcon>
-            </Group>
-          );
+          return <ActionButton data={idSupplier[1] as string} />;
         },
       },
     ],

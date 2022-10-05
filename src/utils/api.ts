@@ -1,4 +1,4 @@
-import { AxiosError } from "axios";
+import { Axios, AxiosError } from "axios";
 import { axios } from "../utils/axios";
 import { InputSignIn, InputSignUp } from "./types";
 
@@ -27,6 +27,17 @@ export const SignUp = async (input: InputSignUp) => {
 export const GetUsers = async () => {
   try {
     const res = await axios.get("/user");
+    const result = await res.data;
+    return result;
+  } catch (err) {
+    const error = err as AxiosError;
+    throw error.response?.data;
+  }
+};
+
+export const GetUsersId = async (id: string) => {
+  try {
+    const res = await axios.get(`/user/${id}`);
     const result = await res.data;
     return result;
   } catch (err) {
