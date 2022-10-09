@@ -2,10 +2,11 @@ import { LoadingOverlay, Paper, createStyles } from "@mantine/core";
 import type { ColumnDef } from "@tanstack/react-table";
 import DataTable from "../../../components/dataTable";
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { GetUsers } from "../../../utils/api";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { DeleteUserId, GetUsers } from "../../../utils/api";
 import { type DataUsers } from "../../../utils/types";
 import { ActionButton } from "../../../components/actionButton";
+import { queryClient } from "../../../App";
 
 type ResponseUsers = {
   code: number;
@@ -28,14 +29,19 @@ export function TableUser() {
     ["GetUsers"],
     GetUsers
   );
+  const mutation = useMutation((val: any) => DeleteUserId(val), {
+    onSuccess: () => {
+      queryClient.invalidateQueries(["GetUsers"]);
+    },
+  });
 
   const dataTable = users
     ? users.data.map((item) => {
         let data = {
-          id: item.ID,
-          nama_pengguna: item.nama_pengguna,
-          role: item.role,
-          CreatedAt: item.CreatedAt,
+          id: String(item.ID),
+          nama_pengguna: String(item.nama_pengguna),
+          role: String(item.role),
+          CreatedAt: String(item.CreatedAt),
         };
         return data;
       })
@@ -66,7 +72,13 @@ export function TableUser() {
         header: "Aksi",
         cell: (props) => {
           const row = props.row.getAllCells().map((item) => item.getValue());
-          return <ActionButton data={row[1] as string} />;
+          return (
+            <ActionButton
+              userId={row[1] as string}
+              userName={row[2] as string}
+              mutation={mutation}
+            />
+          );
         },
       },
     ],
@@ -77,7 +89,7 @@ export function TableUser() {
   return (
     <>
       <Paper shadow="sm" radius="md" className={classes.container}>
-        <LoadingOverlay visible={isLoading} />
+        <LoadingOverlay visible={isLoading || mutation.isLoading} />
         <DataTable
           data={dataTable}
           columns={columns}

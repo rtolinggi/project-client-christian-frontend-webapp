@@ -21,7 +21,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Form, useNavigate, useParams } from "react-router-dom";
 import z from "zod";
 import { queryClient } from "../../../App";
-import { GetUsersId, SignUp } from "../../../utils/api";
+import { UpdateUserId } from "../../../utils/api";
 import { DataUsers, ErrorMutation } from "../../../utils/types";
 
 const schema = z
@@ -31,7 +31,7 @@ const schema = z
       .min(1, { message: "Nama Pengguna TIdak Boleh Kosong" }),
     role: z.string({ required_error: "Role Tidak Boleh Kosong" }),
     kata_sandi: z.string().min(6, { message: "Kata Sandi Minimal 6 Karakter" }),
-    konfirmasi_sandi: z.string().optional(),
+    konfirmasi_sandi: z.string(),
   })
   .refine((data) => data.kata_sandi === data.konfirmasi_sandi, {
     message: "Kati Sandi dan Konfirmasi Sandi Tidak Cocok",
@@ -65,7 +65,7 @@ export const UpdateUser: React.FC = () => {
     },
   });
 
-  const mutation = useMutation(SignUp, {
+  const mutation = useMutation((val) => UpdateUserId(String(id), val), {
     onError: (error: ErrorMutation) => {
       if (error?.code === 409) {
         showNotification({
@@ -86,19 +86,19 @@ export const UpdateUser: React.FC = () => {
     onSuccess: async () => {
       showNotification({
         title: "Berhasil",
-        message: "User Berhasil di Buat",
+        message: "User Berhasil di Ubah",
       });
       navigate("/admin/user");
     },
   });
 
-  const handleSubmit = (val: InputForm) => {
-    delete val.konfirmasi_sandi;
+  const handleSubmit = (val: any) => {
     mutation.mutate(val);
   };
 
   return (
     <Box style={{ position: "relative" }}>
+      <LoadingOverlay visible={mutation.isLoading} />
       <Form onSubmit={form.onSubmit((val) => handleSubmit(val))}>
         <Paper shadow="md" radius="md" px="20px" py="20px">
           <Title order={4}>EDIT USER</Title>
