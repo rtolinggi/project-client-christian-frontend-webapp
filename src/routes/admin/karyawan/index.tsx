@@ -1,16 +1,7 @@
-import {
-  Group,
-  Paper,
-  Text,
-  ThemeIcon,
-  UnstyledButton,
-  createStyles,
-} from "@mantine/core";
+import { createStyles, Paper } from "@mantine/core";
 import type { ColumnDef } from "@tanstack/react-table";
 import DataTable from "../../../components/dataTable";
-import { openConfirmModal } from "@mantine/modals";
 import React from "react";
-import { IconEdit, IconTrash } from "@tabler/icons";
 import { ActionButton } from "../../../components/actionButton";
 
 type Karyawan = {
@@ -81,12 +72,6 @@ export default function TableKaryawan() {
       {
         id: "action",
         header: "Actions",
-        cell: (props) => {
-          const idSupplier = props.row
-            .getAllCells()
-            .map((item) => item.getValue());
-          return <ActionButton data={idSupplier[1] as string} />;
-        },
       },
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
