@@ -59,8 +59,8 @@ export const UpdateUser: React.FC = () => {
     validate: zodResolver(schema),
     initialValues: {
       nama_pengguna: userData ? userData[0].nama_pengguna : "",
-      kata_sandi: userData ? userData[0].kata_sandi : "",
-      konfirmasi_sandi: userData ? userData[0].kata_sandi : "",
+      kata_sandi: "",
+      konfirmasi_sandi: "",
       role: userData ? userData[0].role : "",
     },
   });
