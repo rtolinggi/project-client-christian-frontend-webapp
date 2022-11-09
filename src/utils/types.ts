@@ -1,5 +1,3 @@
-import { ReactNode } from "react";
-
 export type User = {
   CreatedAt: string;
   DeletedAt: string;
@@ -19,14 +17,20 @@ export type ErrorMutation = {
 };
 
 export type InputSignIn = {
-  nama_pengguna: string;
-  kata_sandi: string;
+  email: string;
+  passwordHash: string;
 };
 
 export type InputSignUp = {
-  nama_pengguna: string;
-  kata_sandi: string;
+  email: string;
+  passwordHash: string;
   role: string;
+};
+
+export type InputUpdate = {
+  id?: string;
+  role: string;
+  isActive: boolean;
 };
 
 export type ErrorResponse = {
@@ -38,12 +42,13 @@ export type ErrorResponse = {
 };
 
 export type DataUsers = {
-  ID: number;
-  CreatedAt: Date;
-  UpdatedAt: Date;
-  DeletedAt: Date;
-  nama_pengguna: string;
-  kata_sandi: string;
+  id: string;
+  email: string;
+  createdAt: Date;
+  updatedAt: Date;
+  isActive: boolean;
+  isVerified: boolean;
+  passwordHash: string;
   refresh_token: string;
   role: string;
 };

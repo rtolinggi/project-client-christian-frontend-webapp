@@ -8,33 +8,38 @@ import {
   Button,
   Box,
   LoadingOverlay,
-} from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { showNotification } from "@mantine/notifications";
+} from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { showNotification } from '@mantine/notifications';
 import {
   IconArrowBack,
   IconDeviceFloppy,
   IconLock,
   IconUser,
-} from "@tabler/icons";
-import { useMutation } from "@tanstack/react-query";
-import { Form, useNavigate } from "react-router-dom";
-import z from "zod";
-import { SignUp } from "../../../utils/api";
-import { ErrorMutation } from "../../../utils/types";
+} from '@tabler/icons';
+import { useMutation } from '@tanstack/react-query';
+import { Form, useNavigate } from 'react-router-dom';
+import z from 'zod';
+import { SignUp } from '../../../utils/api';
+import { ErrorMutation } from '../../../utils/types';
 
+const ROLE = ['PROFCOLL', 'CLIENT', 'ADMIN'] as const;
 const schema = z
   .object({
-    nama_pengguna: z
+    email: z
+      .string({ required_error: 'email harus di isi' })
+      .email({ message: 'email tidak valid' }),
+    role: z.enum(ROLE, {
+      invalid_type_error: 'tipe data tidak valid',
+    }),
+    passwordHash: z
       .string()
-      .min(1, { message: "Nama Pengguna TIdak Boleh Kosong" }),
-    role: z.string({ required_error: "Role Tidak Boleh Kosong" }),
-    kata_sandi: z.string().min(6, { message: "Kata Sandi Minimal 6 Karakter" }),
-    konfirmasi_sandi: z.string().optional(),
+      .min(6, { message: 'Kata Sandi Minimal 6 Karakter' }),
+    confirmPassword: z.string().optional(),
   })
-  .refine((data) => data.kata_sandi === data.konfirmasi_sandi, {
-    message: "Kati Sandi dan Konfirmasi Sandi Tidak Cocok",
-    path: ["konfirmasi_sandi"],
+  .refine(data => data.passwordHash === data.confirmPassword, {
+    message: 'Kati Sandi dan Konfirmasi Sandi Tidak Cocok',
+    path: ['konfirmasi_sandi'],
   });
 
 type InputForm = z.infer<typeof schema>;
@@ -44,9 +49,10 @@ export const PostUser: React.FC = () => {
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      nama_pengguna: "",
-      kata_sandi: "",
-      role: "",
+      email: '',
+      passwordHash: '',
+      confirmPassword: '',
+      role: '',
     },
   });
 
@@ -54,86 +60,83 @@ export const PostUser: React.FC = () => {
     onError: (error: ErrorMutation) => {
       if (error?.code === 409) {
         showNotification({
-          title: "Gagal",
-          message: "Nama Pengguna Sudah ada",
-          color: "red",
+          title: 'Gagal',
+          message: 'Email Sudah ada',
+          color: 'red',
         });
       }
 
       if (error?.code === 400) {
         showNotification({
-          title: "Gagal",
-          message: "Role Tidak Boleh Kosong",
-          color: "red",
+          title: 'Gagal',
+          message: 'Role Tidak Boleh Kosong',
+          color: 'red',
         });
       }
     },
     onSuccess: async () => {
       showNotification({
-        title: "Berhasil",
-        message: "User Berhasil di Buat",
+        title: 'Berhasil',
+        message: 'User Berhasil di Buat',
       });
-      navigate("/admin/user");
+      navigate('/admin/user');
     },
   });
 
   const handleSubmit = (val: InputForm) => {
-    delete val.konfirmasi_sandi;
     mutation.mutate(val);
   };
 
   return (
-    <Box style={{ position: "relative" }}>
+    <Box style={{ position: 'relative' }}>
       <LoadingOverlay visible={mutation.isLoading} />
-      <Form onSubmit={form.onSubmit((val) => handleSubmit(val))}>
-        <Paper shadow="md" radius="md" px="20px" py="20px">
+      <Form onSubmit={form.onSubmit((val: any) => handleSubmit(val))}>
+        <Paper shadow='md' radius='md' px='20px' py='20px'>
           <Title order={4}>TAMBAH USER</Title>
-          <Divider my="lg" />
+          <Divider my='lg' />
           <TextInput
             withAsterisk
-            label="Nama Pengguna"
-            autoComplete="email"
+            label='Email'
+            autoComplete='email'
             icon={<IconUser size={18} />}
-            {...form.getInputProps("nama_pengguna")}
+            {...form.getInputProps('email')}
           />
           <PasswordInput
             withAsterisk
-            label="Kata Sandi"
-            autoComplete="current-password"
+            label='Kata Sandi'
             icon={<IconLock size={18} />}
-            mt="md"
-            {...form.getInputProps("kata_sandi")}
+            mt='md'
+            {...form.getInputProps('passwordHash')}
           />
           <PasswordInput
             withAsterisk
-            label="Konfirmasi Sandi"
-            autoComplete="current-password"
+            label='Konfirmasi Sandi'
             icon={<IconLock size={18} />}
-            mt="md"
-            {...form.getInputProps("konfirmasi_sandi")}
+            mt='md'
+            {...form.getInputProps('confirmPassword')}
           />
           <Select
             required
-            description="Pilih role sesuai posisi Karyawan"
-            label="Role"
-            placeholder="Pilih Salah Satu"
-            defaultValue={"SE"}
+            description='Pilih role sesuai posisi user'
+            label='Role'
+            placeholder='Pilih Salah Satu'
+            defaultValue={'PROFCOLL'}
             data={[
-              { value: "SE", label: "SE" },
-              { value: "SPG", label: "SPG" },
-              { value: "LEADER", label: "LEADER" },
+              { value: 'PROFCOLL', label: 'PROFCOLL' },
+              { value: 'CLIENT', label: 'CLIENT' },
+              { value: 'ADMIN', label: 'ADMIN' },
             ]}
-            mt="md"
-            {...form.getInputProps("role")}
+            mt='md'
+            {...form.getInputProps('role')}
           />
         </Paper>
-        <Paper shadow="md" radius="md" px="20px" py="20px" mt="lg">
-          <Button type="submit" leftIcon={<IconDeviceFloppy size={16} />}>
+        <Paper shadow='md' radius='md' px='20px' py='20px' mt='lg'>
+          <Button type='submit' leftIcon={<IconDeviceFloppy size={16} />}>
             Simpan
           </Button>
           <Button
-            ml="md"
-            onClick={() => navigate("/admin/user")}
+            ml='md'
+            onClick={() => navigate('/admin/user')}
             leftIcon={<IconArrowBack size={16} />}>
             Batal
           </Button>

@@ -9,23 +9,23 @@ import {
   Space,
   TextInput,
   Title,
-} from "@mantine/core";
-import { useForm, zodResolver } from "@mantine/form";
-import { IconLock, IconUser } from "@tabler/icons";
-import { Form, useNavigate } from "react-router-dom";
-import Logo from "../../assets/logo.svg";
-import z from "zod";
-import { useMutation } from "@tanstack/react-query";
-import { SignIn } from "../../utils/api";
-import { showNotification } from "@mantine/notifications";
-import { useAuth } from "../../context/authContext";
-import { useEffect } from "react";
+} from '@mantine/core';
+import { useForm, zodResolver } from '@mantine/form';
+import { IconLock, IconUser } from '@tabler/icons';
+import { Form, useNavigate } from 'react-router-dom';
+import Logo from '../../assets/logo.svg';
+import z from 'zod';
+import { useMutation } from '@tanstack/react-query';
+import { SignIn } from '../../utils/api';
+import { showNotification } from '@mantine/notifications';
+import { useAuth } from '../../context/authContext';
+import { useEffect } from 'react';
 
 const schema = z.object({
-  nama_pengguna: z
-    .string()
-    .min(1, { message: "Nama Pengguna TIdak Boleh Kosong" }),
-  kata_sandi: z.string().min(1, { message: "Kata Sandi Tidak Boleh Kosong" }),
+  email: z
+    .string({ required_error: 'email harus disi' })
+    .email({ message: 'email tidak valid' }),
+  passwordHash: z.string().min(1, { message: 'Kata Sandi Tidak Boleh Kosong' }),
 });
 
 type InputForm = z.infer<typeof schema>;
@@ -36,8 +36,8 @@ export default function Login() {
   const form = useForm({
     validate: zodResolver(schema),
     initialValues: {
-      nama_pengguna: "",
-      kata_sandi: "",
+      email: '',
+      passwordHash: '',
     },
   });
 
@@ -49,15 +49,15 @@ export default function Login() {
     onError: (error: any) => {
       signOut();
       showNotification({
-        title: "Otentikasi Gagal",
-        message: "Nama Pengguna atau Kata Sandi Tidak Cocok",
-        color: "red",
+        title: 'Otentikasi Gagal',
+        message: 'Nama Pengguna atau Kata Sandi Tidak Cocok',
+        color: 'red',
       });
     },
-    onSuccess: async (data) => {
+    onSuccess: async data => {
       signIn(data?.data.access_token);
       showNotification({
-        title: "Otentikasi Berhasil",
+        title: 'Otentikasi Berhasil',
         message: `Selamat datang`,
       });
     },
@@ -65,7 +65,7 @@ export default function Login() {
 
   useEffect(() => {
     if (isAuth) {
-      navigate("/admin/beranda");
+      navigate('/admin/beranda');
     }
   }, [isAuth]);
 
@@ -73,51 +73,51 @@ export default function Login() {
     <>
       <Paper
         withBorder
-        shadow="md"
+        shadow='md'
         p={30}
-        radius="md"
-        sx={(theme) => ({
+        radius='md'
+        sx={theme => ({
           background:
-            theme.colorScheme === "dark"
-              ? "rgba(0,0,0,0.6)"
-              : "rgba(255,255,255,0.1)",
-          backdropFilter: "blur(5px)",
-          minWidth: "320px",
-          margin: "auto",
+            theme.colorScheme === 'dark'
+              ? 'rgba(0,0,0,0.6)'
+              : 'rgba(255,255,255,0.1)',
+          backdropFilter: 'blur(5px)',
+          minWidth: '320px',
+          margin: 'auto',
         })}>
         <LoadingOverlay visible={mutation.isLoading} />
         <Center>
-          <Image src={Logo} alt="logo" width={80} />
+          <Image src={Logo} alt='logo' width={80} />
         </Center>
         <Center>
-          <Title align="left" order={3}>
+          <Title align='left' order={3}>
             Login
           </Title>
         </Center>
-        <Space h="md" />
-        <Divider my="xs" label={"Selamat Datang"} labelPosition="center" />
-        <Form onSubmit={form.onSubmit((val) => handleSubmit(val))}>
+        <Space h='md' />
+        <Divider my='xs' label={'Selamat Datang'} labelPosition='center' />
+        <Form onSubmit={form.onSubmit(val => handleSubmit(val))}>
           <TextInput
             withAsterisk
-            label="Nama Pengguna"
-            autoComplete="email"
+            label='Nama Pengguna'
+            autoComplete='email'
             icon={<IconUser size={18} />}
-            {...form.getInputProps("nama_pengguna")}
+            {...form.getInputProps('email')}
           />
           <PasswordInput
             withAsterisk
-            label="Kata Sandi"
-            autoComplete="current-password"
+            label='Kata Sandi'
+            autoComplete='current-password'
             icon={<IconLock size={18} />}
-            mt="md"
-            {...form.getInputProps("kata_sandi")}
+            mt='md'
+            {...form.getInputProps('passwordHash')}
           />
-          <Button fullWidth mt="xl" type="submit">
+          <Button fullWidth mt='xl' type='submit'>
             login
           </Button>
         </Form>
-        <Space h="md" />
-        <Divider my="xs" labelPosition="center" />
+        <Space h='md' />
+        <Divider my='xs' labelPosition='center' />
       </Paper>
     </>
   );

@@ -20,10 +20,12 @@ export const ActionButton: React.FC<PropsWithChildren<Props>> = ({
 
   return (
     <Group spacing="xs">
-      <ThemeIcon
-        color="red"
-        variant="light"
-        style={{ cursor: "pointer", marginRight: "6px" }}>
+      <ThemeIcon color="grape" variant="light" style={{ cursor: "pointer" }}>
+        <UnstyledButton onClick={() => navigate(`${userId}/detail`)}>
+          <IconEyeCheck size={20} stroke={1.5} />
+        </UnstyledButton>
+      </ThemeIcon>
+      <ThemeIcon color="red" variant="light" style={{ cursor: "pointer" }}>
         <UnstyledButton
           onClick={() =>
             openConfirmModal({
@@ -45,21 +47,13 @@ export const ActionButton: React.FC<PropsWithChildren<Props>> = ({
           <IconTrash size={20} stroke={1.5} />
         </UnstyledButton>
       </ThemeIcon>
-      <ThemeIcon
-        color="lime"
-        variant="light"
-        style={{ cursor: "pointer", marginRight: "6px" }}>
+      <ThemeIcon color="lime" variant="light" style={{ cursor: "pointer" }}>
         <UnstyledButton
           onClick={() => navigate(`${userId}/update`)}
           type="submit"
           name="action"
           value="updateStore">
           <IconEdit size={20} stroke={1.5} />
-        </UnstyledButton>
-      </ThemeIcon>
-      <ThemeIcon color="grape" variant="light" style={{ cursor: "pointer" }}>
-        <UnstyledButton onClick={() => navigate(`${userId}/detail`)}>
-          <IconEyeCheck size={20} stroke={1.5} />
         </UnstyledButton>
       </ThemeIcon>
     </Group>
